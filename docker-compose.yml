@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    restart: always
+    networks:
+      - back-network
+    depends_on:
+      - clickhouse
+    environment:
+      FLASK_ENV: development
+
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    restart: always
+    networks:
+      - back-network
+    env_file:
+      - .env
+    environment:
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+
+
+networks:
+  back-network:
+    driver: bridge
